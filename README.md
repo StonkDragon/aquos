@@ -6,7 +6,7 @@ Install:
     cd aquos
     sh install.sh
 
-
+[Documentation](https://github.com/StonkDragon/aquos/blob/main/Documentation.txt)
 
 I have only tested the Compiler on a Mac so it might not work on Linux.
 If you want to compile to a flat Binary, shc must be installed.
