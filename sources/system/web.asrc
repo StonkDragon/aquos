@@ -1,0 +1,12 @@
+function getWebPage() {
+    result=$(curl $1)
+    if [ -z $2 ]
+    then
+        echo "$result"
+    else
+        echo "$result" >> $2
+    fi
+}
+function openWebPage() {
+    open "$1" "$2"
+}

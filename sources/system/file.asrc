@@ -1,0 +1,58 @@
+function createFile() {
+    file=$1
+    touch $file
+}
+function createFolder() {
+    folder=$1
+    mkdir $folder
+}
+function removeFile() {
+    file=$1
+    rm $file
+}
+function removeFolder() {
+    folder=$1
+    rm -r $folder
+}
+function appendText() {
+    file=$1
+    text=$2
+    echo "$text" >> $file
+}
+function setText() {
+    file=$1
+    text=$2
+    echo "$text" > $file
+}
+function getAllText() {
+    file=$1
+    cat $file
+}
+function getTextInLine() {
+    file=$1
+    line=$2
+    sed -n "${line}p" < $file
+}
+function getCharAtOffset() {
+    file=$1
+    offset=$2
+    char=$(tail -c +$offset $file | head -c 1)
+    echo $char
+}
+function getCharsAtOffset() {
+    file=$1
+    offset=$2
+    count=$3
+    chars=$(tail -c +$offset $file | head -c $count)
+    echo $chars
+}
+function fileContainsString() {
+    file=$1
+    string=$2
+    if grep -Fq "$string" $file
+    then
+        echo 1
+    else
+        echo 0
+    fi
+}

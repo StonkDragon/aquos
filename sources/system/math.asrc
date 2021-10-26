@@ -1,0 +1,47 @@
+function add() {
+    add1=$1
+    add2=$2
+    echo $((add1+add2))
+}
+function sub() {
+    sub1=$1
+    sub2=$2
+    echo $((sub1-sub2))
+}
+function mul() {
+    mul1=$1
+    mul2=$2
+    echo $((mul1*mul2))
+}
+function div() {
+    div1=$1
+    div2=$2
+    echo $((div1/div2))
+}
+function pow() {
+    base=$1
+    exp=$2
+    result=$((base**exp))
+    echo $result
+}
+function sqrt() {
+    echo "scale=2;sqrt($1)" | bc
+}
+function mod() {
+    echo $(($1%$2))
+}
+function factor() {
+    factor=$1
+    if ((factor<=1))
+    then
+        echo 1
+    else
+        n=$(factor $((factor-1)))
+        echo $((n*factor))
+    fi
+}
+function rand() {
+    max=$1
+    result=$(($RANDOM%$max))
+    echo $result
+}

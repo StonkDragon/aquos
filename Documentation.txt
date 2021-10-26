@@ -1,0 +1,85 @@
+Aquos Documentation
+
+Operators:
+    ==  Equal
+    !=  Not Equal
+    >   Greater than
+    >=  Greater than or Equal
+    <   Less than
+    <=  Less than or Equal
+
+Variables:
+    int _exampleint_        Declares Variable of Type 'int'
+    string _examplestring_  Declares Variable of Type 'string'
+
+    Variable Labels always have to start and end with '_'.
+    Variable References have to be proceeded by '$'.
+
+Functions:
+    Declaration:
+        func name() [
+            # Code
+        ]
+    
+    Function Labels can't start or end with '_'.
+    Every Aquos Script has to have a main() Function.
+    This can be disabled when compiling using the --supressMainWarnings
+    Flag after the Source Script.
+
+Compiler Options:
+    -c  Compile Source Script
+    -x  Make compiled File executable
+        The -x Option implies the -n Option
+    -n  Bake Sourced Scripts into compiled File
+        This increases the Filesize
+
+Sources:
+    Sources (.asrc) are written in Bash.
+
+    system:
+        getDate()                               Returns the current Date and Time
+        getDateUTC()                            Returns the current Date and Time in UTC
+        version()                               Returns the Version of Aquos installed
+        printc(text, color)                     Outputs text in color
+        print(text)                             Outputs text
+        quit()                                  Stops Execution
+        getCurrentTime()                        Returns the current Time in Seconds
+        getCurrentTimeMillis()                  Returns the current Time in Milliseconds
+        clearScreen()                           Clears the Screen
+
+    system.file:
+        createFile(file)                        Create file
+        createFolder(folder)                    Create folder
+        removeFile(file)                        Remove file
+        removeFolder(folder)                    Remove folder
+        appendText(file, text)                  Append text to file
+        setText(file, text)                     Set text of file
+        getAllText(file)                        Returns all Text in file
+        getTextInLine(file, line)               Returns Text in line of file
+        getCharAtOffset(file, offset)           Returns the Character at offset in file
+        getCharsAtOffset(file, offset, count)   Returns the Characters at offset in file
+        fileContainsString(file, text)          Returns 1, if text is found in file
+
+    system.input
+        getUserInput(count)                     Returns count Characters of User input
+
+    system.math
+        add(a, b)                               Adds a and b
+        sub(a, b)                               Subtracts a and b
+        mul(a, b)                               Multiplies a and b
+        div(a, b)                               Divides a and b
+        pow(a, b)                               Raises a to b
+        sqrt(a)                                 Returns Sqare Root of a
+        mod(a, b)                               Modulo a and b
+        factor(a)                               Factorial a
+        rand(a)                                 Random Number between 1 and a
+
+    system.web
+        getWebPage(url)                         Returns Content of Web Page at url
+        getWebPage(url, file)                   Stores Content of url to file
+        openWebPage(url, exec)                  Opens url in exec where exec is a Program
+
+Broken:
+    system:
+        java()
+        jar()

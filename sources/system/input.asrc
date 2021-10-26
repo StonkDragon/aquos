@@ -1,0 +1,5 @@
+function getUserInput() {   
+    charcount=$1
+    read -en$charcount input
+    echo "$input"
+}
