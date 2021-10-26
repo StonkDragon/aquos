@@ -28,7 +28,7 @@ Functions:
 
 Compiler Options:
     -c  Compile Source Script
-    -x  Make compiled File executable
+    -x  Compile Output to Executable (shc required)
         The -x Option implies the -n Option
     -n  Bake Sourced Scripts into compiled File
         This increases the Filesize
