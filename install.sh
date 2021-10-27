@@ -44,4 +44,4 @@ rm -f install.sh
 rm -rf .git/
 rm -f README.md
 
-echo "Aquos Command line Utility has been installed\nUsage: aqs -(c,n,x,p) \$infile \$outfile\n       aqspc \$directory"
+echo "Aquos Command line Utility has been installed\nUsage: aqs -(c,n,x,p) \$infile extra-Arguments\n       aqspc \$directory"

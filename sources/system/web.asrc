@@ -1,6 +1,6 @@
 #!/bin/bash
 function getWebPage() {
-    result=$(curl $1)
+    result=$(curl -f $1)
     if [ -z $2 ]
     then
         echo "$result"

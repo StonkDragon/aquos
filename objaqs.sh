@@ -4,6 +4,9 @@ comp_infile=$2
 comp_extras=$3
 
 is_in_func=0
+is_in_object=0
+new_object_possible=1
+has_struct=0
 
 shc_installed=$(which shc)
 
@@ -23,7 +26,7 @@ else
     if [[ $comp_args = "-"* && $comp_args == *"c"* ]] && [[ $comp_args != *"p"* ]]
     then
         file="${2%%\.*}"
-        file=$file.caqs
+        file=$file.objcaqs
         rm -f $file
         touch $file
         echo "#!/bin/bash" >> $file
@@ -52,15 +55,21 @@ fi
 
 # FUNCTIONS DO NOT TOUCH
 
+function objecthandler() {
+    cmd=${cmd:7}
+    cmd=${cmd%??}
+    comp_object_name=$cmd
+}
+
 function illegaloperation() {
-    echo "Illegal Operation: $cmd"
+    echo "Illegal Operation: $line"
     echo "Compile failed."
     rm -f ~/.aqs/consts.txt
     exit 1
 }
 
 function invalidsyntax() {
-    echo "Invalid Syntax: $cmd"
+    echo "Invalid Syntax: $line"
     echo "Compile failed."
     rm -f ~/.aqs/consts.txt
     exit 1
@@ -78,7 +87,7 @@ function packhandler() {
     cmd="${cmd:5}"
     echo "Packing $cmd"
     cmd=$(echo "$cmd" | tr '.' '/')
-    if [ -f src/$cmd.objaquos ]
+    if [ -f src/$cmd.objcaqs ]
     then
         echo "source $cmd.objcaqs" >> $file
     else
@@ -127,10 +136,10 @@ function ifhandler() {
     cmd="${cmd:$((cmdlen+1))}"
     cmd=${cmd//==/-eq}
     cmd=${cmd//!=/-ne}
-    cmd=${cmd//>/-gt}
     cmd=${cmd//>=/-ge}
-    cmd=${cmd//</-lt}
     cmd=${cmd//<=/-le}
+    cmd=${cmd//</-lt}
+    cmd=${cmd//>/-gt}
     echo "if [[ $cmd ]]" >> $file
     echo "then" >> $file
 }
@@ -163,10 +172,10 @@ function whilehandler() {
     cmd="${cmd:$((cmdlen+1))}"
     cmd=${cmd//==/-eq}
     cmd=${cmd//!=/-ne}
-    cmd=${cmd//>/-gt}
     cmd=${cmd//>=/-ge}
-    cmd=${cmd//</-lt}
     cmd=${cmd//<=/-le}
+    cmd=${cmd//</-lt}
+    cmd=${cmd//>/-gt}
     echo "while [ $cmd ]" >> $file
     echo "do" >> $file
 }
@@ -186,7 +195,18 @@ function funchandler() {
     cmdlen=${#cmd2}
     if [[ $cmd2 != "_"* && $cmd2 != *"_" ]]
     then
-        echo "function $cmd2() {" >> $file
+        echo "function $comp_object_name.$cmd2() {" >> $file
+    else
+        invalidsyntax $line
+    fi
+}
+
+function structhandler() {
+    cmd="${cmd%\(*}"
+    cmd2=${cmd:7}
+    if [[ $cmd2 != "_"* && $cmd2 != *"_" && $cmd2 == $comp_object_name ]]
+    then
+        echo "function $comp_object_name() {" >> $file
     else
         invalidsyntax $line
     fi
@@ -200,10 +220,10 @@ function elifhandler() {
     cmd="${cmd:$((cmdlen+1))}"
     cmd=${cmd//==/-eq}
     cmd=${cmd//!=/-ne}
-    cmd=${cmd//>/-gt}
     cmd=${cmd//>=/-ge}
-    cmd=${cmd//</-lt}
     cmd=${cmd//<=/-le}
+    cmd=${cmd//</-lt}
+    cmd=${cmd//>/-gt}
     echo "elif [[ $cmd ]]" >> $file
     echo "then" >> $file
 }
@@ -332,55 +352,67 @@ then
         if [[ $cmd != "#"* ]]
         then
 
-        if [[ $cmd == "import<"*">" && $is_in_func == "0" ]]
+        if [[ $cmd == "import<"*">" && $is_in_func == "0" && $is_in_object == "0" ]]
         then
             importhandler $comp_args
-        elif [[ $cmd == "pack<"*">"  && $is_in_func == "0" ]]
+        elif [[ $cmd == "pack<"*">"  && $is_in_func == "0" && $is_in_object == "0" ]]
         then
             packhandler $cmd
-        elif [[ $cmd == "if"* && $cmd == *"{" && $is_in_func == "1" ]]
+        elif [[ $cmd == "if"* && $cmd == *"{" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             ifhandler
-        elif [[ $cmd == "try "* && $is_in_func == "1" ]]
+        elif [[ $cmd == "object"* && $cmd == *"(" && $is_in_func == "0" && $is_in_object == "0" && $new_object_possible == "1" ]]
+        then
+            is_in_object=1
+            new_object_possible=0
+            objecthandler
+        elif [[ $cmd == "try "* && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             tryhandler
-        elif [[ $cmd == "} else if"* && $cmd == *"{" && $is_in_func == "1" ]]
+        elif [[ $cmd == "} else if"* && $cmd == *"{" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             elifhandler
-        elif [[ $cmd == "} else {" && $is_in_func == "1" ]]
+        elif [[ $cmd == "} else {" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             elsehandler
-        elif [[ $cmd == "}" && $is_in_func == "1" ]]
+        elif [[ $cmd == "}" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             echo "fi" >> $file
-
-        elif [[ $cmd == "while"* && $cmd == *"{{" && $is_in_func == "1" ]]
+        elif [[ $cmd == ")" && $is_in_func == "0" && $is_in_object == "1" ]]
+        then
+            is_in_object=0
+        elif [[ $cmd == "while"* && $cmd == *"{{" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             whilehandler
-        elif [[ $cmd == "for"* && $cmd == *"{{" && $is_in_func == "1" ]]
+        elif [[ $cmd == "for"* && $cmd == *"{{" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             forhandler
-        elif [[ $cmd == "}}" && $is_in_func == "1" ]]
+        elif [[ $cmd == "}}" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             echo "done" >> $file
-        elif [[ $cmd == "func "* && $cmd == *"[" && $is_in_func == "0" ]]
+        elif [[ $cmd == "func "* && $cmd == *"[" && $is_in_func == "0" && $is_in_object == "1" ]]
         then
             is_in_func=1
             funchandler
-        elif [[ $cmd == "]" && $is_in_func == "1" ]]
+        elif [[ $cmd == "struct "* && $cmd == *"[" && $is_in_func == "0" && $is_in_object == "1" && $has_struct == "0" ]]
+        then
+            is_in_func=1
+            has_struct=1
+            structhandler
+        elif [[ $cmd == "]" && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             is_in_func=0
             echo "}" >> $file
-        elif [[ $cmd == "var "* && $is_in_func == "0" ]]
+        elif [[ $cmd == "var "* && $is_in_func == "0" && $is_in_object == "1" ]]
         then
             varadder
-        elif [[ $cmd == "const "* && $is_in_func == "0" ]]
+        elif [[ $cmd == "const "* && $is_in_func == "0" && $is_in_object == "1" ]]
         then
             constadder
-        elif [[ $cmd == "_"* && $is_in_func == "1" ]]
+        elif [[ $cmd == "_"* && $is_in_func == "1" && $is_in_object == "1" ]]
         then
             varhandler
-        elif [[ $is_in_func == "1" ]]
+        elif [[ $is_in_func == "1" && $is_in_object == "1" ]]
         then
             if [[ $cmd == *"("*")" ]]
             then
@@ -405,15 +437,18 @@ then
                 #echo $arg
                 echo " $arg" >> $file
             fi
+        else
+            echo Is in Function: $is_in_func
+            echo Is in Object: $is_in_object
+            echo Has Main: $has_main
+            echo Has Struct: $has_struct
+            invalidsyntax $line
         fi
 
         fi
         fi
     done < $comp_infile
-    if [[ $comp_extras != "--supressMainWarnings" ]]
-    then
-        echo "main \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 \$9" >> $file
-    fi
+    echo $comp_object_name >> $file
     echo "$comp_infile compiled to $file with no errors."
     rm -f ~/.aqs/consts.txt
     if [[ $comp_args == *"x"* ]]
@@ -424,7 +459,6 @@ then
         if shc -r -o $outfile -f $infile
         then
             echo "$infile compiled to $outfile."
-            rm $infile.x.c
         else
             echo "Error compiling $infile."
         fi

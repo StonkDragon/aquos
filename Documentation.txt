@@ -15,8 +15,8 @@ Variables:
     Variable Labels always have to start and end with '_'.
     Variable References have to be proceeded by '$'.
 
-    __args1__ - __args9__   Reference to Function Arguments
-                            Reference to Script Arguments in main()
+    _§1_ - _§9_     Reference to Function Arguments
+                    Reference to Script Arguments in main()
 
 Functions:
     Declaration:

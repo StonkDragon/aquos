@@ -6,7 +6,7 @@ function getDateUTC() {
     date -u
 }
 function version() {
-    echo "$(tail -c +1 ~/.aqs/.versioninfo)"
+    echo "$(curl -f https://raw.githubusercontent.com/StonkDragon/aquos/main/versioninfo)"
 }
 function printc() {
     if [ $2 = "black" ]
@@ -64,7 +64,12 @@ function print() {
     echo "$1"
 }
 function quit() {
-    echo "Program exited with Exit Code $1"
+    if [ -z $1 ]
+    then
+        true
+    else
+        echo "Program exited with Exit Code $1"
+    fi
     exit $1
 }
 function getCurrentTime() {
