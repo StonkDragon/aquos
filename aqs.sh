@@ -53,7 +53,7 @@ function importhandler() {
         else
             echo "\"$cmd\" is not a source file."
         fi
-    elif [[ $1 == *"n"* || $1 == *"x"* ]]
+    elif [[ $1 == *"n"* ]]
     then
         if [ -f ~/.aqs/sources/$cmd.asrc ]
         then
