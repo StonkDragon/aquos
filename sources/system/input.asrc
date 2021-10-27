@@ -1,3 +1,4 @@
+#!/bin/bash
 function getUserInput() {   
     charcount=$1
     read -en$charcount input

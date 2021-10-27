@@ -15,6 +15,9 @@ Variables:
     Variable Labels always have to start and end with '_'.
     Variable References have to be proceeded by '$'.
 
+    __args1__ - __args9__   Reference to Function Arguments
+                            Reference to Script Arguments in main()
+
 Functions:
     Declaration:
         func name() [
@@ -31,6 +34,7 @@ Compiler Options:
     -x  Make compiled File executable
     -n  Bake Sourced Scripts into compiled File
         This increases the Filesize
+    -p  aqs will behave just as aqspc, where infile is is the Directory containing main.aquos
 
 Sources:
     Sources (.asrc) are written in Bash.

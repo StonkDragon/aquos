@@ -1,4 +1,7 @@
 #! /bin/bash
+comp_args=$1
+comp_infile=$2
+comp_extras=$3
 
 is_in_func=0
 rm -f ~/.aqs/.defints
@@ -12,7 +15,7 @@ then
     exit 0
 fi
 
-if [ -z $2 ]
+if [ -z $comp_infile ]
 then
     echo "No File specified!"
     rm -f ~/.aqs/.defints
@@ -20,20 +23,39 @@ then
     echo "Compile failed."
     exit 1
 else
-    if [[ $1 = "-"* && $1 == *"c"* ]]
+    if [[ $comp_args = "-"* && $comp_args == *"c"* ]] && [[ $comp_args != *"p"* ]]
     then
         file="${2%%\.*}"
         file=$file.caqs
         rm -f $file
         touch $file
         echo "#!/bin/bash" >> $file
+    elif [[ $comp_args = "-"* && $comp_args == *"p"* ]] && [[ $comp_args != *"c"* ]]
+    then
+        sh ~/.aqs/aqspc.sh $comp_infile
+        sleep 0.5
+        rm -f start.sh
+        touch start.sh
+        echo "cd $comp_infile" >> start.sh
+        if [ -f $comp_infile/main.aqs ]
+        then
+            echo "./main.aqs \"\$1\" \"\$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9\"" >> start.sh
+        elif [ -f $comp_infile/Main.aqs ]
+        then
+            echo "./Main.aqs \"\$1\" \"\$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9\"" >> start.sh
+        fi
+        echo "Created Launch Script start.sh"
+        exit 0
+    elif [[ $comp_args == *"p"* ]] && [[ $comp_args == *"c"* ]]
+    then
+        echo "The -c and -p Arguments are mutually exclusive and can't be used together."
+        exit 1
     fi
 fi
 
 # FUNCTIONS DO NOT TOUCH
 
 function packhandler() {
-    cmd=$1
     cmd="${cmd%%\>*}"
     cmd="${cmd:5}"
     echo "Packing $cmd"
@@ -169,6 +191,15 @@ function varhandler() {
                 cmd=${cmd:$((varlen+1))}
                 arg=$(echo "$arg" | tr ',' ' ')
                 arg=$(echo "$arg" | tr '\q' ',')
+                arg=${arg//__args1__/"\$1"}
+                arg=${arg//__args2__/"\$2"}
+                arg=${arg//__args3__/"\$3"}
+                arg=${arg//__args4__/"\$4"}
+                arg=${arg//__args5__/"\$5"}
+                arg=${arg//__args6__/"\$6"}
+                arg=${arg//__args7__/"\$7"}
+                arg=${arg//__args8__/"\$8"}
+                arg=${arg//__args9__/"\$9"}
                 echo "$var=\$($cmd $arg)" >> $file
             else
                 echo "$var=$val" >> $file
@@ -237,15 +268,15 @@ function stringadder() {
     fi
 }
 
-if [[ $1 == "-"* && $1 == *"c"* ]]
+if [[ $comp_args == "-"* && $comp_args == *"c"* ]]
 then
-    lastchar=$(tail -c -1 $2 | head -1)
+    lastchar=$(tail -c -1 $comp_infile | head -1)
     #echo $lastchar
     if [ -z $lastchar ]
     then
         true
     else
-        echo "" >> $2
+        echo "" >> $comp_infile
     fi
 
     while read line
@@ -254,9 +285,9 @@ then
         then
             has_main=1
         fi
-    done < $2
+    done < $comp_infile
 
-    if [[ $has_main != 1 && $3 != "--supressMainWarnings" ]]
+    if [[ $has_main != 1 && $comp_extras != "--supressMainWarnings" ]]
     then
         echo "No main() Function specified!"
         rm -f ~/.aqs/.defints
@@ -278,10 +309,10 @@ then
 
         if [[ $cmd == "import<"*">" && $is_in_func == "0" ]]
         then
-            importhandler $1
+            importhandler $comp_args
         elif [[ $cmd == "pack<"*">"  && $is_in_func == "0" ]]
         then
-            packhandler $cmd $2
+            packhandler $cmd
         elif [[ $cmd == "if"* && $cmd == *"{" && $is_in_func == "1" ]]
         then
             ifhandler
@@ -335,21 +366,31 @@ then
                 echo "$cmd\c" >> $file
                 arg=$(echo "$arg" | tr ',' ' ')
                 arg=$(echo "$arg" | tr '\q' ',')
+                arg=${arg//__args1__/"\$1"}
+                arg=${arg//__args2__/"\$2"}
+                arg=${arg//__args3__/"\$3"}
+                arg=${arg//__args4__/"\$4"}
+                arg=${arg//__args5__/"\$5"}
+                arg=${arg//__args6__/"\$6"}
+                arg=${arg//__args7__/"\$7"}
+                arg=${arg//__args8__/"\$8"}
+                arg=${arg//__args9__/"\$9"}
+                #echo $arg
                 echo " $arg" >> $file
             fi
         fi
 
         fi
         fi
-    done < $2
-    if [[ $3 != "--supressMainWarnings" ]]
+    done < $comp_infile
+    if [[ $comp_extras != "--supressMainWarnings" ]]
     then
         echo "main \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 \$9" >> $file
     fi
-    echo "$2 compiled to $file with no errors."
+    echo "$comp_infile compiled to $file with no errors."
     rm -f ~/.aqs/.defints
     rm -f ~/.aqs/.defstrings
-    if [[ $1 == *"x"* ]]
+    if [[ $comp_args == *"x"* ]]
     then
         infile=$file
         outfile=${file%.*}

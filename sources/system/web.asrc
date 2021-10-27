@@ -1,3 +1,4 @@
+#!/bin/bash
 function getWebPage() {
     result=$(curl $1)
     if [ -z $2 ]

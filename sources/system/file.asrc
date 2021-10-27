@@ -1,3 +1,4 @@
+#!/bin/bash
 function createFile() {
     file=$1
     touch $file
