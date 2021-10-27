@@ -23,7 +23,7 @@ else
     if [[ $1 = "-"* && $1 == *"c"* ]]
     then
         file="${2%%\.*}"
-        file=$file.sh
+        file=$file.caqs
         rm -f $file
         touch $file
         echo "#!/bin/bash" >> $file
@@ -34,19 +34,11 @@ fi
 
 function packhandler() {
     cmd=$1
-    #echo $cmd
     cmd="${cmd%%\>*}"
-    #echo $cmd
     cmd="${cmd:5}"
-    #echo $cmd
-    #echo $cmd
     echo "Packing $cmd"
     cmd=$(echo "$cmd" | tr '.' '/')
-    #echo $cmd
-    cmd="./$cmd"
-    #echo $cmd
-    #sh ~/.aqs/aqs.sh -c ./$cmd --supressMainWarnings
-    echo "source $cmd.sh" >> $file
+    echo "source $cmd.caqs" >> $file
 }
 
 function importhandler() {

@@ -7,8 +7,10 @@ string _text_
 
 #define main function
 func main() [
+    
     #get user input and store it in _text_
     _text_=getUserInput(100000)
+
     #output user input to screen
     print("$_text_")
 ]

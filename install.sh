@@ -31,3 +31,5 @@ cd ~/.aqs
 rm -f install.sh
 rm -rf .git/
 rm -f README.md
+
+echo "Aquos Command line Utility has been installed\nUsage: aqs -(c,n,x) infile"
